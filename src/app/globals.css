@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette, pulled from the Figma Dev page */
+  --color-beige: #f5f3f0;
+  --color-beige-dark: #e8e2d5;
+  --color-brown: #3c2f27;
+  --color-brown-soft: #4a3b30;
+  --color-cream: #f7f5f0;
+  --color-stone: #96938a;
+
+  /* Albertus Light is the ONLY typeface on this site (matches the Figma
+     spec exactly — H1/Paragraph/Paragraph Caps all specify MAlbertus).
+     Set as the Tailwind default font stack so every element inherits it
+     without needing a font-* utility class anywhere. */
+  --font-sans: var(--font-albertus), "Times New Roman", serif;
+  --font-display: var(--font-albertus), "Times New Roman", serif;
+
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  background-color: var(--color-beige);
+  color: var(--color-brown);
+  font-family: var(--font-sans);
+  line-height: 1.4; /* 140% line height site-wide, matching the Figma type styles */
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display,
+.font-body {
+  font-family: var(--font-sans);
+}
+
+.tracking-label {
+  letter-spacing: 0.14em;
+}
+
+/* Hide scrollbar for the draggable/infinite horizontal galleries while
+   keeping native scroll (and touch) behavior intact. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
