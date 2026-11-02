@@ -44,7 +44,7 @@ export default function CaseStudyGallery({ images, projectName }: { images: Img[
     const s = i % SLOTS.length;
     if (PAIR_STARTS.has(s) && i + 1 < images.length) {
       blocks.push(
-        <div key={i} className="flex flex-col sm:flex-row gap-6 sm:gap-[60px] sm:items-start sm:justify-center">
+        <div key={i} className="flex flex-col sm:flex-row gap-12 sm:gap-[60px] sm:items-start sm:justify-center">
           <Figure image={images[i]} slot={SLOTS[s]} alt={projectName} />
           <Figure image={images[i + 1]} slot={SLOTS[s + 1]} alt={projectName} />
         </div>
@@ -55,5 +55,5 @@ export default function CaseStudyGallery({ images, projectName }: { images: Img[
       i += 1;
     }
   }
-  return <div className="flex flex-col gap-14 md:gap-[100px]">{blocks}</div>;
+  return <div className="flex flex-col gap-28 md:gap-[100px]">{blocks}</div>;
 }
