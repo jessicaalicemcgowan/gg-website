@@ -192,7 +192,7 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
       )}
 
       {data.approachImages.length > 0 && (
-        <GalleryStrip exclusion gap={70} clickable={false} images={toStrip(data.approachImages, [249])} />
+        <GalleryStrip exclusion gap={70} clickable={false} images={data.approachImages.map((im) => ({ src: im.url, w: 200, h: 250 }))} />
       )}
 
       <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] pt-16 md:pt-24 pb-8 flex flex-col items-center gap-16">
