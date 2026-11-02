@@ -104,7 +104,7 @@ export async function getHomepage(): Promise<Homepage> {
       "introImage": introImage ${RAW("@")},
       "introProject": introProject._ref,
       "featuredProject": featuredProject._ref,
-      "grid": projectsGrid[defined(project._ref)]{ "projectId": project._ref, "image": image ${RAW("@")}, caption },
+      "grid": projectsGrid[defined(project._ref)]{ "projectId": project._ref, "image": image ${RAW("@")}, extraCaption },
       "approachImages": approachImages[defined(image.asset)] ${IMG},
       "featureImage": featureImage ${IMG}
     },
@@ -117,14 +117,17 @@ export async function getHomepage(): Promise<Homepage> {
   // Ordered picks first, then any project not yet in the grid (so nothing is
   // silently left out); fall back to a project's first image.
   const grid: Homepage["grid"] = [];
-  const push = (projectId: string, image?: Img, caption?: string) => {
+  // Each entry shows the chosen image of its project; the caption is the
+  // project's name and location (plus any extra text).
+  const push = (projectId: string, image?: Img, extra?: string) => {
     const p = projects[projectId];
     if (!p) return;
     const img = image?.url ? image : p.images[0];
     if (!img) return;
-    grid.push({ projectId, image: img, caption: caption || undefined });
+    const base = [p.name.toUpperCase(), p.location].filter(Boolean).join(", ");
+    grid.push({ projectId, image: img, caption: extra ? `${base}. ${extra}` : base });
   };
-  for (const g of h.grid ?? []) push(g.projectId, g.image, g.caption);
+  for (const g of h.grid ?? []) push(g.projectId, g.image, g.extraCaption);
   const listed = new Set<string>((h.grid ?? []).map((g: { projectId: string }) => g.projectId));
   for (const p of Object.values(projects)) if (!listed.has(p.id)) push(p.id);
 
