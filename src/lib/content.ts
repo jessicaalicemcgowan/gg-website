@@ -86,6 +86,7 @@ export type Homepage = {
   introProject?: string; // project id
   originsText?: string;
   featuredProject?: string;
+  featuredImages: Img[];
   featuredText?: string;
   paragraph?: string;
   grid: { projectId: string; image: Img; caption?: string }[];
@@ -105,6 +106,7 @@ export async function getHomepage(): Promise<Homepage> {
       "introProject": introProject._ref,
       "featuredProject": featuredProject._ref,
       "grid": projectsGrid[defined(project._ref)]{ "projectId": project._ref, "image": image ${RAW("@")}, extraCaption },
+      "featuredImages": featuredImages[defined(image.asset)] ${IMG},
       "approachImages": approachImages[defined(image.asset)] ${IMG},
       "featureImage": featureImage ${IMG}
     },
@@ -138,6 +140,7 @@ export async function getHomepage(): Promise<Homepage> {
     introProject: h.introProject,
     originsText: h.originsText,
     featuredProject: h.featuredProject,
+    featuredImages: clean(h.featuredImages),
     featuredText: h.featuredText,
     paragraph: h.paragraph,
     grid,

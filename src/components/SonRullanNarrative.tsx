@@ -16,7 +16,7 @@ const body = "font-body text-[1.35rem] md:text-2xl leading-[1.4] whitespace-pre-
 const caption = "font-body text-[11px] leading-[1.4] opacity-90 max-w-[400px]";
 
 // Heights cycle so the horizontal strips keep an uneven, editorial rhythm.
-const STRIP_HEIGHTS = [250, 300, 208, 250, 300, 220];
+const STRIP_HEIGHTS = [250, 300, 208, 250, 300, 195, 208, 250, 200, 300, 195];
 const toStrip = (images: Img[], heights = STRIP_HEIGHTS) =>
   images.map((im, i) => {
     const h = heights[i % heights.length];
@@ -92,6 +92,7 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
   };
 
   const featured = data.featuredProject ? data.projects[data.featuredProject] : undefined;
+  const rowImages = data.featuredImages.length ? data.featuredImages : (featured?.images ?? []);
   const grid = data.grid;
 
   // Collage layout cycles: wide · pair (portrait + landscape) · wide · narrow portrait
@@ -148,13 +149,12 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
         )}
       </div>
 
-      {featured && featured.images.length > 0 && (
+      {rowImages.length > 0 && (
         <GalleryStrip
           objectPosition="top"
-          startInset={100}
-          onImageClick={() => openSlideOut(featured.id)}
+          onImageClick={() => openSlideOut(featured?.id)}
           scaleOnMobile={0.65}
-          images={toStrip(featured.images)}
+          images={toStrip(rowImages)}
         />
       )}
 
