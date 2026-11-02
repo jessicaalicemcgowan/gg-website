@@ -24,7 +24,7 @@ Repo: GitHub `jessicaalicemcgowan/gg-website`, branch `main`. Netlify auto-deplo
 - `objectsPage` (singleton): intro text + ordered `objectsGrid[]` (active objects not listed are appended).
 - `siteSettings` (singleton): contact email, follow link, legal text (footer).
 
-All queries live in `src/lib/content.ts`. Pages use `export const revalidate = 60` (ISR), so edits appear within about a minute — no webhooks. Images are served and resized by the Sanity CDN through a custom `next/image` loader (`src/lib/sanityLoader.ts`).
+All queries live in `src/lib/content.ts`. Pages use `export const dynamic = "force-dynamic"` (no CDN caching on the Sanity client), so published edits appear immediately — no webhooks or rebuilds. Images are served and resized by the Sanity CDN through a custom `next/image` loader (`src/lib/sanityLoader.ts`).
 
 ## Key files
 

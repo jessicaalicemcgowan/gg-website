@@ -31,16 +31,24 @@ function Fig({
   captionFirst,
   onOpen,
   delay,
+  num,
+  total,
 }: {
+  num: number;
+  total: number;
   item: Item;
   width: string;
   captionFirst?: boolean;
   onOpen: () => void;
   delay?: number;
 }) {
-  const cap = item.caption ? (
-    <figcaption className={caption + (captionFirst ? " order-2 md:order-1" : "")}>{item.caption}</figcaption>
-  ) : null;
+  const cap = (
+    <figcaption className={caption + (captionFirst ? " order-2 md:order-1" : "")}>
+      {num} / {total}
+      <span className="inline-block w-6" aria-hidden />
+      {item.caption}
+    </figcaption>
+  );
   return (
     <Reveal className={`flex flex-col gap-2 w-full ${width}`} delay={delay}>
       <figure className="flex flex-col gap-2 w-full">
@@ -95,8 +103,8 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
       const [a, b] = [grid[i], grid[i + 1]];
       blocks.push(
         <div key={i} className="flex flex-col md:flex-row gap-8 md:gap-[100px] justify-center w-full">
-          <Fig item={a} width="md:w-[506px]" captionFirst onOpen={open(a)} />
-          <Fig item={b} width="md:w-[404px]" delay={0.1} onOpen={open(b)} />
+          <Fig item={a} num={i + 1} total={grid.length} width="md:w-[506px]" captionFirst onOpen={open(a)} />
+          <Fig item={b} num={i + 2} total={grid.length} width="md:w-[404px]" delay={0.1} onOpen={open(b)} />
         </div>
       );
       i += 2;
@@ -106,6 +114,8 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
         <Fig
           key={i}
           item={it}
+          num={i + 1}
+          total={grid.length}
           width={kind === 3 ? "max-w-[455px]" : "max-w-[692px]"}
           captionFirst={kind === 3}
           onOpen={open(it)}

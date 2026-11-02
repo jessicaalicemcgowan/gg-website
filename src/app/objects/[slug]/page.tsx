@@ -6,11 +6,8 @@ import Carousel from "@/components/Carousel";
 import Reveal from "@/components/Reveal";
 import { getObject, getObjectSlugs, getSettings } from "@/lib/content";
 
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  return (await getObjectSlugs()).map((slug) => ({ slug }));
-}
+// Always fetch fresh content from Sanity, so published edits show up straight away.
+export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

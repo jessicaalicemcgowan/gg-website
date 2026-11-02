@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Wordmark from "./Wordmark";
 import Tagline from "./Tagline";
+import type { TaglineBlock } from "@/lib/content";
 
 const AUTO_ADVANCE_MS = 5000;
 
 export type HeroSlide = { desktop: string; mobile?: string; caption?: string };
 
-export default function HomeHero({ slides, tagline }: { slides: HeroSlide[]; tagline?: string }) {
+export default function HomeHero({ slides, tagline }: { slides: HeroSlide[]; tagline?: TaglineBlock[] }) {
   const [index, setIndex] = useState(0);
   const total = Math.max(slides.length, 1);
   const advance = () => setIndex((i) => (i + 1) % total);
@@ -74,11 +75,11 @@ export default function HomeHero({ slides, tagline }: { slides: HeroSlide[]; tag
           transition={{ duration: 0.9, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
           className="pointer-events-auto max-w-md"
         >
-          <Tagline text={tagline} className="text-[#fbf8f2] [&_a]:text-[#fbf8f2]" />
+          <Tagline blocks={tagline} className="text-[#fbf8f2] [&_a]:text-[#fbf8f2]" />
         </motion.div>
       </div>
 
-      {slides[index]?.caption && (
+      {slides.length > 0 && (
         <div className="absolute bottom-6 right-6 z-10 pointer-events-none max-w-sm text-right">
           <AnimatePresence mode="wait">
             <motion.p
@@ -90,7 +91,7 @@ export default function HomeHero({ slides, tagline }: { slides: HeroSlide[]; tag
               className="text-[11px] leading-[1.4] text-[#fbf8f2]"
             >
               {index + 1} / {total}
-              {" ".repeat(8)}
+              <span className="inline-block w-6" aria-hidden />
               {slides[index].caption}
             </motion.p>
           </AnimatePresence>

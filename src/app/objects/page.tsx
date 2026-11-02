@@ -4,7 +4,8 @@ import ObjectsGrid from "@/components/ObjectsGrid";
 import Reveal from "@/components/Reveal";
 import { getObjectsPage } from "@/lib/content";
 
-export const revalidate = 60;
+// Always fetch fresh content from Sanity, so published edits show up straight away.
+export const dynamic = "force-dynamic";
 
 export default async function ObjectsPage() {
   const { introText, objects } = await getObjectsPage();

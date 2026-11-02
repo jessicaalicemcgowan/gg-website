@@ -4,8 +4,8 @@ import HomeHero from "@/components/HomeHero";
 import SonRullanNarrative from "@/components/SonRullanNarrative";
 import { getCarousel, getHomepage } from "@/lib/content";
 
-// Content comes from Sanity; refresh the page at most once a minute.
-export const revalidate = 60;
+// Always fetch fresh content from Sanity, so published edits show up straight away.
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [slides, data] = await Promise.all([getCarousel(), getHomepage()]);

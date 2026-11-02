@@ -5,10 +5,16 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "nwnucp27",
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
   apiVersion: "2025-01-01",
-  useCdn: true,
+  useCdn: false,
 });
 
 export type Img = { url: string; w: number; h: number; caption?: string };
+
+export type TaglineBlock = {
+  _key: string;
+  markDefs?: { _key: string; target?: string; url?: string }[];
+  children?: { _key: string; text: string; marks?: string[] }[];
+};
 
 export type Project = {
   id: string;
@@ -74,7 +80,7 @@ export async function getCarousel(): Promise<CarouselSlide[]> {
 }
 
 export type Homepage = {
-  tagline?: string;
+  tagline?: TaglineBlock[];
   introImage?: Img;
   introCaption?: string;
   introProject?: string; // project id
@@ -93,7 +99,8 @@ export type Homepage = {
 export async function getHomepage(): Promise<Homepage> {
   const data = await client.fetch(`{
     "h": *[_type=="homepage"][0]{
-      tagline, introCaption, originsText, featuredText, paragraph, approachText, exhibitionText,
+      "tagline": tagline[]{ _key, markDefs, children },
+      introCaption, originsText, featuredText, paragraph, approachText, exhibitionText,
       "introImage": introImage ${RAW("@")},
       "introProject": introProject._ref,
       "featuredProject": featuredProject._ref,
@@ -122,7 +129,7 @@ export async function getHomepage(): Promise<Homepage> {
   for (const p of Object.values(projects)) if (!listed.has(p.id)) push(p.id);
 
   return {
-    tagline: h.tagline,
+    tagline: Array.isArray(h.tagline) && h.tagline.length ? h.tagline : undefined,
     introImage: h.introImage?.url ? h.introImage : undefined,
     introCaption: h.introCaption,
     introProject: h.introProject,

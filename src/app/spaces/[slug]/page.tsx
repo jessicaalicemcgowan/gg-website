@@ -4,11 +4,8 @@ import Footer from "@/components/Footer";
 import CaseStudyContent from "@/components/CaseStudyContent";
 import { getProject, getProjectSlugs } from "@/lib/content";
 
-export const revalidate = 60;
-
-export async function generateStaticParams() {
-  return (await getProjectSlugs()).map((slug) => ({ slug }));
-}
+// Always fetch fresh content from Sanity, so published edits show up straight away.
+export const dynamic = "force-dynamic";
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
