@@ -80,7 +80,7 @@ export default function HomeHero({ slides, tagline }: { slides: HeroSlide[]; tag
       </div>
 
       {slides.length > 0 && (
-        <div className="absolute bottom-6 right-6 z-10 pointer-events-none max-w-sm text-right">
+        <div className="absolute bottom-6 right-6 z-10 pointer-events-none max-w-[480px] text-right">
           <AnimatePresence mode="wait">
             <motion.p
               key={index}
