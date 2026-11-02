@@ -1,0 +1,7 @@
+# While the site is in build/review, ask search engines not to index it.
+# Delete this [[headers]] block (and robots.ts + the robots block in
+# src/app/layout.tsx) when launching.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

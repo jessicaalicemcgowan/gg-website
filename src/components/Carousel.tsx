@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import type { GalleryImage } from "@/data/caseStudies";
+export type CarouselImage = { src: string; alt: string; caption?: string };
 
 /**
  * Click-to-advance carousel: clicking the image softly crossfades to the
@@ -15,12 +15,13 @@ export default function Carousel({
   images,
   className,
 }: {
-  images: GalleryImage[];
+  images: CarouselImage[];
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
   const total = images.length;
   const current = images[index];
+  if (!current) return null;
 
   const advance = () => setIndex((i) => (i + 1) % total);
 
@@ -46,6 +47,7 @@ export default function Carousel({
           </motion.div>
         </AnimatePresence>
       </button>
+      {current.caption && (
       <AnimatePresence mode="wait">
         <motion.p
           key={index}
@@ -58,6 +60,7 @@ export default function Carousel({
           {current.caption}
         </motion.p>
       </AnimatePresence>
+      )}
     </div>
   );
 }

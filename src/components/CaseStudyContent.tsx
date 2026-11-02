@@ -1,6 +1,6 @@
 "use client";
 
-import type { CaseStudy } from "@/data/caseStudies";
+import type { Project } from "@/lib/content";
 import CaseStudyGallery from "./CaseStudyGallery";
 
 /**
@@ -10,17 +10,17 @@ import CaseStudyGallery from "./CaseStudyGallery";
  * self-contained regardless of what wraps it.
  */
 export default function CaseStudyContent({
-  caseStudy,
+  project,
   onOpenInfo,
 }: {
-  caseStudy: CaseStudy;
+  project: Project;
   onOpenInfo?: () => void;
 }) {
   return (
     <div className="bg-brown text-beige min-h-full px-6 md:px-10 pt-[200px] pb-[180px] flex flex-col gap-14">
       <div className="flex items-baseline gap-20">
-        <p className="font-display text-2xl">{caseStudy.title}</p>
-        {onOpenInfo && (
+        <p className="font-display text-2xl">{project.name}</p>
+        {onOpenInfo && (project.location || project.blurb) && (
           <button
             onClick={onOpenInfo}
             className="text-xs font-display tracking-label uppercase hover:underline underline-offset-4 decoration-1"
@@ -30,7 +30,7 @@ export default function CaseStudyContent({
         )}
       </div>
 
-      <CaseStudyGallery projectName={caseStudy.title} />
+      <CaseStudyGallery images={project.images} projectName={project.name} />
     </div>
   );
 }

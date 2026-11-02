@@ -1,26 +1,24 @@
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import CaseStudyContent from "@/components/CaseStudyContent";
-import { caseStudies, getCaseStudy } from "@/data/caseStudies";
+import { getProject, getProjectSlugs } from "@/lib/content";
 
-export function generateStaticParams() {
-  return caseStudies.map((c) => ({ slug: c.slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  return (await getProjectSlugs()).map((slug) => ({ slug }));
 }
 
-export default async function CaseStudyPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const caseStudy = getCaseStudy(slug);
-  if (!caseStudy) notFound();
+  const project = await getProject(slug);
+  if (!project) notFound();
 
   return (
     <main className="min-h-screen bg-beige pt-24">
-      <Header variant="page" />
-      <CaseStudyContent caseStudy={caseStudy} />
+      <SiteHeader variant="page" />
+      <CaseStudyContent project={project} />
       <Footer />
     </main>
   );

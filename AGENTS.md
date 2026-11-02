@@ -6,156 +6,45 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Geoffrey Grunfeld — website
 
-Frontend-first build (same approach as Michael's site): build and refine
-design/animation/feel here first on static/placeholder content, get client
-sign-off, THEN wire up Sanity (content) and Shopify (Objects/shop). Not
-approved yet as of this writing — do not start CMS/commerce wiring without
-checking in first.
+Live (review) site: https://geoffrey-grunfeld-website.netlify.app — final domain https://geoffreygrunfeld.com
+Repo: GitHub `jessicaalicemcgowan/gg-website`, branch `main`. Netlify auto-deploys on every push to `main`.
 
 ## Stack
 
-- Next.js 16 (App Router, Turbopack), TypeScript, React 19
-- Tailwind CSS v4 (CSS-first config — see `@theme` block in
-  `src/app/globals.css`, there is no `tailwind.config.js`)
-- Framer Motion for animation/transitions
-- No CMS/commerce wired up yet. All content lives in `src/data/*.ts` as
-  typed placeholder data, shaped so it maps cleanly onto future Sanity
-  documents / Shopify products later. Confirmed headless: this Next.js app
-  is the only frontend — Shopify is Storefront-API-only for Objects/shop
-  data (no theme, no Liquid), Sanity is the content layer for Spaces/case
-  studies.
+- Next.js 16 (App Router), TypeScript, React 19, Tailwind v4 (CSS-first, see `@theme` in `src/app/globals.css`), Framer Motion.
+- Content: **Sanity** (project `nwnucp27`, dataset `production`, public). Studio is hosted at https://geoffrey-grunfeld.sanity.studio/ and its schema is **MCP-managed** (there is no local studio code; schema changes are deployed with the Sanity MCP `deploy_schema`, then `deploy_studio`).
+- Layout/design is code (not client-editable). Text, images, projects, objects, order and footer are CMS-editable.
 
-## IMPORTANT: this folder is Dropbox-synced
+## Sanity content model
 
-This whole project lives inside a Dropbox folder
-(`~/Dropbox/Geoffry Grunfeld/GG-Website`). **Never install `node_modules` or
-run builds (`.next/`) inside this folder** — it's slow to sync, and in this
-Cowork/agent environment write/delete permissions on Dropbox-mounted folders
-are unreliable (deletes can silently fail). If you're working from an agent
-sandbox: install deps and run dev/build somewhere outside Dropbox (e.g. a
-temp dir or a proper git clone location), and only copy clean *source*
-files back into this folder. `.gitignore` already excludes `node_modules`
-and `.next`.
+- `homepageCarousel` (singleton): `slides[]` — desktop image, optional mobile image, caption. Max 8; the "1/8" numbering is automatic.
+- `project`: name, slug, location, blurb, `images[]` (image + optional caption). Opens in the slide-out drawer (location + blurb = "info" panel).
+- `shopObject`: name, slug, `active`, `priceOnRequest`, `price`, description, materials, measurements, `images[]` (1st = grid thumbnail, 2nd = hover). The "inquire" button is a pre-filled `mailto:` built in `src/app/objects/[slug]/page.tsx`. (The type is `shopObject` because `object` is a reserved Sanity name.)
+- `homepage` (singleton): tagline, header links, intro image/caption/project, origins, featured project (+text), paragraph, `projectsGrid[]` (ordered picks: project + image + optional caption; projects not listed are appended automatically), approach text/images, feature image + caption, exhibition text.
+- `objectsPage` (singleton): intro text + ordered `objectsGrid[]` (active objects not listed are appended).
+- `siteSettings` (singleton): contact email, follow link, legal text (footer).
 
-If you're a human running this locally in a normal editor/terminal, this
-constraint doesn't apply to you — `npm install && npm run dev` works
-normally, just be aware Dropbox will sync `node_modules` unless you move the
-repo out of Dropbox or add `node_modules`/`.next` to Dropbox's ignore list
-(Finder → right-click folder → "Ignore" or the `com.dropbox.ignored` xattr).
+All queries live in `src/lib/content.ts`. Pages use `export const revalidate = 60` (ISR), so edits appear within about a minute — no webhooks. Images are served and resized by the Sanity CDN through a custom `next/image` loader (`src/lib/sanityLoader.ts`).
 
-There is currently a leftover `node_modules` / `.next` / `delete-test.txt`
-in this folder from an agent mistake early in the project — safe to delete
-via Finder, an agent sandbox could not remove them.
+## Key files
 
-## Design source
+- `src/app/page.tsx` — homepage: `HomeHero` (carousel) then `SonRullanNarrative` (the Spaces content, driven by the `homepage` document).
+- `src/components/SonRullanNarrative.tsx` — fixed layout; the projects grid cycles through wide / pair / wide / narrow slots using each image's native aspect ratio.
+- `src/components/CaseStudyContent.tsx`, `CaseStudyGallery.tsx`, `CaseStudyInfoContent.tsx`, `SlideOutPanel.tsx` — project drawer.
+- `src/components/Header.tsx` (client) + `SiteHeader.tsx` (server wrapper that loads links), `Footer.tsx` (server, loads settings).
+- `src/app/objects/*` — objects grid and product pages. `src/app/spaces/[slug]` — direct project pages.
+- `src/components/Reveal.tsx` — scroll fade/drag-in wrapper used on most blocks.
+- Fonts: Albertus site-wide (`font-display` / `font-body`).
+- Files containing only `export {}` with an "Obsolete" comment (`SpacesSection`, `HeroImage`, `InfiniteScrollRow`, `src/data/*`) are leftovers that couldn't be deleted from the synced folder — safe to delete.
 
-- Figma: "Geoffrey Grunfeld We..." file, **"Dev" page** (not "Page 1" —
-  that's WIP/exploration). All copy in `src/data/*.ts` is transcribed
-  verbatim from the Dev page's text layers. Per client instruction, do not
-  rewrite any copy — including the Lorem Ipsum placeholder captions, which
-  are baked into the Figma file itself, not something we introduced.
-- Animation reference: cabinberlin.com/residency (scroll feel) and
-  cabinberlin.com/exhibition/transmissons (slide-out panel behavior).
-- Real photography/product images have been exported from Figma into
-  `public/images/` (hashed filenames, referenced directly from
-  `src/data/caseStudies.ts` and `src/data/objects.ts`). The old
-  `public/images/placeholder/` solid-color stand-ins are no longer
-  referenced by any page but are still on disk — safe to delete. Not every
-  image in the Dev page has been pulled yet (e.g. Spaces grid cards beyond
-  Son Rullan reuse Son Rullan's photos as placeholders); to pull more, add
-  more node IDs via the Figma MCP `get_design_context` tool with
-  `dirForAssetWrites` pointed at this folder's `public/images` path.
+## Hidden from search until launch
 
-## Structure
+`src/app/layout.tsx` (`robots: { index: false }`), `src/app/robots.ts` (disallow all) and `netlify.toml` (`X-Robots-Tag`) keep the site out of Google. **To launch: remove all three**, then redeploy.
 
-- `src/app/page.tsx` — homepage: loading sequence (beige → wordmark fades in
-  → hero image fades in → tagline/nav fades in), then directly into the
-  Spaces grid (no gap — scrolling the homepage takes you straight into
-  Spaces, per brief).
-- `src/components/SonRullanNarrative.tsx` — the actual Spaces page content:
-  a 1:1 rebuild of Figma node 65:111, a single long-form editorial page
-  (hero card → origins → gallery strip → pull-quote → unlabeled paragraph →
-  image collage → approach → second gallery strip (mix-blend-exclusion) →
-  exhibition → "next: Objects" → footer). This is NOT a grid of project
-  thumbnails — an earlier version of this codebase built a grid+slide-out
-  pattern based on a misreading of the brief; that was wrong and has been
-  replaced. `src/app/page.tsx` renders it directly below `HomeHero`
-  (continuous scroll, per brief), and `src/app/spaces/page.tsx` renders it
-  standalone with the sticky nav.
-- `src/components/SlideOutPanel.tsx` / `CaseStudyContent.tsx` /
-  `CaseStudyInfoContent.tsx` — the right-drawer pattern, now wired back in:
-  clicking any image in `SonRullanNarrative.tsx`'s first ("origins") gallery
-  strip opens this drawer (`CaseStudyContent` using `caseStudies[0]` /
-  Son Rullan data), with an "info" button that layers a second drawer
-  (`CaseStudyInfoContent`) on top, per Figma node 65:775. The second gallery
-  strip (mix-blend-exclusion, further down the page) still opens the plain
-  `Lightbox` on click — that scoping was intentional per the brief ("Son Ru
-  horizontal scroll row" specifically).
-- `src/app/spaces/[slug]/page.tsx` — direct/linkable per-case-study page,
-  still using the placeholder-duplication approach (Can Cigonya/Gelat/German
-  reuse Son Rullan's content) until more properties are designed.
-- `src/app/objects/page.tsx` + `src/app/objects/[slug]/page.tsx` — shop grid
-  + PDP. No cart/checkout yet (explicitly out of scope for now).
-- `src/components/Header.tsx` — the two nav states + hover-reveal behavior.
-  `variant="home"` renders the inline extended nav as part of the loading
-  sequence and swaps to a sticky reduced nav on scroll; `variant="page"` is
-  the sticky reduced nav from first paint (used on every other page).
-  Hovering the wordmark in the reduced nav drops down the full extended nav
-  in a brown overlay.
-- `src/components/SlideOutPanel.tsx` — generic right-side drawer; a second
-  instance with `layer={1}` stacks on top for the "info" panel.
-- `src/components/InfiniteScrollRow.tsx` — user-controlled, infinitely
-  looping horizontal gallery (triples the image list, silently jumps by one
-  set-width at either edge).
-- `src/components/Carousel.tsx` — click-to-advance, soft crossfade,
-  caption updates with the image.
-- `src/data/caseStudies.ts` — Son Rullan is the one fully-designed case
-  study; the other Spaces grid cards (Can Cigonya, Can Gelat, Can German)
-  reuse its content as a placeholder per client instruction, ready to swap
-  for real Sanity content per-property later.
-- `src/data/objects.ts` — same placeholder approach: one designed PDP
-  ("CH 0045"), reused across the grid until Shopify products exist.
+## Working on this project
 
-## Fonts
-
-Site-wide, every piece of text uses Albertus Light (`--font-body` is
-aliased to `--font-albertus` in `globals.css`) — this matches the Figma
-spec exactly (H1/Paragraph/Paragraph Caps all specify the MAlbertus
-family). There is no second body serif; don't reintroduce one without
-checking Figma first.
-
-## Images
-
-`public/images/image-1.jpg` … `image-6.jpg` are real property photos
-Jessica dropped directly into the folder (also present under their
-original `Image 1.jpg` … `Image 6.jpg` names — harmless duplicates, safe to
-delete via Finder). They're used in the homepage hero carousel and in
-`SonRullanNarrative.tsx`. Everything else under `public/images/` is a
-hash-named export pulled from Figma via the Dev Mode MCP — when pulling
-more, note that Figma sometimes exports the *same* underlying photo under
-different node names in different pulls, which caused a real duplicate
-image bug (same file used twice in the collage) that got fixed on
-2026-07-16. Sanity-check for repeated `src` values when using these.
-
-## Status / next up
-
-1. Get real images exported from Figma (see Design source above) and swap
-   into `public/images/`.
-2. Client review of feel/motion against cabinberlin.com reference.
-3. Once approved: wire up Sanity for case studies/objects content, Shopify
-   Storefront API for the Objects shop (cart/checkout still out of scope
-   until specced).
-4. Two open items from the 2026-07-16 feedback round couldn't be resolved
-   with confidence from screenshots alone and are still outstanding on the
-   image collage in `SonRullanNarrative.tsx`: "swap the order of the images
-   in image 2" and "change the size of image in (image 3) to match the size
-   of (image 4)". Everything else from that round is done (hero header
-   full-bleed/no-padding, 6-image crossfading carousel with 1/6..6/6
-   captions, extended nav moved to top, Albertus font site-wide, origins
-   strip top-aligned + clickable + opens the slide-out drawer, infinite loop
-   scroll on both strips, footer matched to node 65:239, the Can
-   German/Can Cigonya two-up block removed). Next time, ask Jessica to
-   describe these two by content/position (e.g. "the fireplace photo," "the
-   third image in the collage") rather than by screenshot number, since
-   "Image N" numbering hasn't lined up 1:1 with collage order across
-   messages.
+- The folder is Dropbox-synced and `.git` lives in it, so `node_modules`/`.next` are slow and file deletes from agent sandboxes often fail. `npm run dev` uses `--webpack` because Turbopack's cache corrupts under Dropbox. Agent sandboxes: copy the source to a temp dir outside Dropbox, install and build there, and copy only source files back.
+- Agent sandboxes can't reach Sanity/Netlify from the shell (network allowlist), so a local `next build` fails at data fetching; use `tsc --noEmit` + `eslint`, and use the Sanity MCP `query_documents` to test GROQ. Real builds happen on Netlify.
+- Agents have no git identity or GitHub credentials: the human runs `git add/commit/push` from their own terminal (not the `npm run dev` tab).
+- Never commit tokens. The Sanity project ID and dataset are public and live in `src/lib/content.ts`; no env vars are needed.
+- Hand-over: the client gets a Sanity login (project member, Editor role) invited via sanity.io/manage. Sanity stays on Jessica's account.

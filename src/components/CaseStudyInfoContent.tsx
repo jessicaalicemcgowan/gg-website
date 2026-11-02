@@ -1,4 +1,4 @@
-import type { CaseStudy } from "@/data/caseStudies";
+import type { Project } from "@/lib/content";
 
 /**
  * Text-only "info" sub-panel — a 1:1 rebuild of Figma node 65:1093/1096/1097:
@@ -11,15 +11,15 @@ import type { CaseStudy } from "@/data/caseStudies";
  * label in the main gallery panel it layers on top of.
  */
 export default function CaseStudyInfoContent({
-  caseStudy,
+  project,
 }: {
-  caseStudy: CaseStudy;
+  project: Project;
 }) {
   return (
     <div className="bg-stone text-beige min-h-full px-6 md:px-10 pt-[208px] pb-[180px]">
       <div className="flex flex-col sm:flex-row sm:items-baseline gap-6 sm:gap-[10px]">
-        <p className="font-display tracking-label uppercase text-xs shrink-0 sm:w-[160px]">{caseStudy.infoLocation}</p>
-        <p className="font-body text-sm md:text-base leading-[1.4] opacity-90">{caseStudy.infoText}</p>
+        <p className="font-display tracking-label uppercase text-xs shrink-0 sm:w-[160px]">{project.location}</p>
+        <p className="font-body text-sm md:text-base leading-[1.4] opacity-90">{project.blurb}</p>
       </div>
     </div>
   );
