@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { albertus } from "@/lib/fonts";
 import { NavThemeProvider } from "@/lib/navTheme";
+import PreviewBanner from "@/components/PreviewBanner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={albertus.variable}>
       <body className="bg-beige text-brown">
         <NavThemeProvider>{children}</NavThemeProvider>
+        <PreviewBanner />
       </body>
     </html>
   );

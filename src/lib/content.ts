@@ -1,12 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@sanity/client";
+import { draftMode } from "next/headers";
 
-export const client = createClient({
+const base = {
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "nwnucp27",
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
   apiVersion: "2025-01-01",
   useCdn: false,
-});
+};
+
+export const client = createClient(base);
+
+/**
+ * Normal visitors get published content. When preview mode is on (cookie set via
+ * /api/preview?secret=…) and a read token exists, drafts are included too.
+ */
+async function sanity() {
+  const token = process.env.SANITY_READ_TOKEN;
+  if (token && (await draftMode()).isEnabled) {
+    return createClient({ ...base, token, perspective: "drafts" });
+  }
+  return client;
+}
 
 export type Img = { url: string; w: number; h: number; caption?: string };
 
@@ -51,7 +66,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 };
 
 export async function getSettings(): Promise<SiteSettings> {
-  const s = await client.fetch(`*[_type=="siteSettings"][0]{contactEmail, followLabel, followUrl, legalText}`);
+  const s = await (await sanity()).fetch(`*[_type=="siteSettings"][0]{contactEmail, followLabel, followUrl, legalText}`);
   return {
     contactEmail: s?.contactEmail || DEFAULT_SETTINGS.contactEmail,
     followLabel: s?.followLabel || DEFAULT_SETTINGS.followLabel,
@@ -66,14 +81,14 @@ export const DEFAULT_LINKS: HeaderLink[] = [
 ];
 
 export async function getHeaderLinks(): Promise<HeaderLink[]> {
-  const h = await client.fetch(`*[_type=="homepage"][0]{ "links": headerLinks[defined(label) && defined(url)]{label, url} }`);
+  const h = await (await sanity()).fetch(`*[_type=="homepage"][0]{ "links": headerLinks[defined(label) && defined(url)]{label, url} }`);
   return h?.links?.length ? h.links : DEFAULT_LINKS;
 }
 
 export type CarouselSlide = { desktop: string; mobile?: string; caption?: string };
 
 export async function getCarousel(): Promise<CarouselSlide[]> {
-  const c = await client.fetch(
+  const c = await (await sanity()).fetch(
     `*[_type=="homepageCarousel"][0].slides[defined(imageDesktop.asset)][0...8]{ "desktop": imageDesktop.asset->url, "mobile": imageMobile.asset->url, caption }`
   );
   return clean<CarouselSlide>(c);
@@ -98,7 +113,7 @@ export type Homepage = {
 };
 
 export async function getHomepage(): Promise<Homepage> {
-  const data = await client.fetch(`{
+  const data = await (await sanity()).fetch(`{
     "h": *[_type=="homepage"][0]{
       "tagline": tagline[]{ _key, markDefs, children },
       introCaption, originsText, featuredText, paragraph, approachText, exhibitionText,
@@ -153,12 +168,12 @@ export async function getHomepage(): Promise<Homepage> {
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
-  const p = await client.fetch(`*[_type=="project" && slug.current==$slug][0] ${PROJECT}`, { slug });
+  const p = await (await sanity()).fetch(`*[_type=="project" && slug.current==$slug][0] ${PROJECT}`, { slug });
   return p ? { ...p, images: clean(p.images) } : null;
 }
 
 export async function getProjectSlugs(): Promise<string[]> {
-  return clean<string>(await client.fetch(`*[_type=="project" && defined(slug.current)].slug.current`));
+  return clean<string>(await (await sanity()).fetch(`*[_type=="project" && defined(slug.current)].slug.current`));
 }
 
 export type ShopObject = {
@@ -188,7 +203,7 @@ function toObject(o: any): ShopObject {
 }
 
 export async function getObjectsPage(): Promise<{ introText?: string; objects: ShopObject[] }> {
-  const d = await client.fetch(`{
+  const d = await (await sanity()).fetch(`{
     "intro": *[_type=="objectsPage"][0].introText,
     "order": *[_type=="objectsPage"][0].objectsGrid[]._ref,
     "all": *[_type=="shopObject" && active != false && defined(slug.current)] | order(name asc) ${OBJ}
@@ -207,10 +222,10 @@ export async function getObjectsPage(): Promise<{ introText?: string; objects: S
 }
 
 export async function getObject(slug: string): Promise<ShopObject | null> {
-  const o = await client.fetch(`*[_type=="shopObject" && active != false && slug.current==$slug][0] ${OBJ}`, { slug });
+  const o = await (await sanity()).fetch(`*[_type=="shopObject" && active != false && slug.current==$slug][0] ${OBJ}`, { slug });
   return o ? toObject(o) : null;
 }
 
 export async function getObjectSlugs(): Promise<string[]> {
-  return clean<string>(await client.fetch(`*[_type=="shopObject" && active != false && defined(slug.current)].slug.current`));
+  return clean<string>(await (await sanity()).fetch(`*[_type=="shopObject" && active != false && defined(slug.current)].slug.current`));
 }
