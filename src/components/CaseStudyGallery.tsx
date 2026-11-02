@@ -18,7 +18,7 @@ const SLOTS: Slot[] = [
   { aspect: "aspect-[400/325]", width: "sm:w-[400px]", mobileWidth: "w-[70%] ml-auto", className: "sm:mx-auto" },
   { aspect: "aspect-[404/505]", width: "sm:w-[404px]" },
   { aspect: "aspect-[404/505]", width: "sm:w-[404px]" },
-  { aspect: "aspect-[615/411]", width: "sm:w-[615px]", mobileWidth: "w-[70%] mr-auto", className: "sm:mx-auto" },
+  { aspect: "aspect-[615/411]", width: "sm:w-[615px]", mobileWidth: "w-[80%] mx-auto", className: "sm:mx-auto" },
   { aspect: "aspect-[400/500]", width: "sm:w-[400px]", mobileWidth: "w-full", className: "sm:mx-auto" },
   { aspect: "aspect-[404/323]", width: "sm:w-[404px]", mobileWidth: "w-[70%] ml-auto" },
   { aspect: "aspect-[506/633]", width: "sm:w-[506px]" },
