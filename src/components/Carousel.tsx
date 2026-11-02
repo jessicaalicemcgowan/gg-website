@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+
 export type CarouselImage = { src: string; alt: string; caption?: string };
 
 /**
- * Click-to-advance carousel: clicking the image softly crossfades to the
- * next one in place, caption updates with it. Captions already carry their
- * own "N / 8 …" numbering as literal text from Figma, so this component
- * doesn't add a second counter on top of it.
+ * Click-to-advance carousel. All images are stacked and cross-faded, so the
+ * outgoing image fades out while the next fades in (no blank gap in
+ * between). Images are loaded up front so nothing pops in mid-fade.
  */
 export default function Carousel({
   images,
@@ -34,32 +34,31 @@ export default function Carousel({
         aria-label="Show next image"
         disabled={total <= 1}
       >
-        <AnimatePresence mode="wait">
+        {images.map((img, i) => (
           <motion.div
+            key={img.src + i}
+            initial={false}
+            animate={{ opacity: i === index ? 1 : 0 }}
+            transition={{ duration: 0.45, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            <Image src={img.src} alt={img.alt} fill sizes="(min-width: 768px) 573px, 100vw" priority={i < 2} className="object-cover" />
+          </motion.div>
+        ))}
+      </button>
+      {current.caption && (
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.p
             key={index}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0"
+            transition={{ duration: 0.3 }}
+            className="mt-3 text-xs font-body leading-[1.4] opacity-80"
           >
-            <Image src={current.src} alt={current.alt} fill sizes="100vw" className="object-cover" />
-          </motion.div>
+            {current.caption}
+          </motion.p>
         </AnimatePresence>
-      </button>
-      {current.caption && (
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mt-3 text-xs font-body leading-[1.4] opacity-80"
-        >
-          {current.caption}
-        </motion.p>
-      </AnimatePresence>
       )}
     </div>
   );
