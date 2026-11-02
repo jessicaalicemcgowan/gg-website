@@ -46,6 +46,7 @@ export default function GalleryStrip({
   stackOnMobile = false,
   scaleOnMobile,
   clickable = true,
+  startInset,
 }: {
   images: StripImage[];
   exclusion?: boolean;
@@ -55,6 +56,8 @@ export default function GalleryStrip({
   stackOnMobile?: boolean;
   scaleOnMobile?: number;
   clickable?: boolean;
+  /** Where the first image sits on load, in px from the left edge (desktop). Mobile uses 24px. Omit to start flush left. */
+  startInset?: number;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -75,7 +78,15 @@ export default function GalleryStrip({
     if (node && node.dataset.init !== "1") {
       node.dataset.init = "1";
       requestAnimationFrame(() => {
-        node.scrollLeft = node.scrollWidth / 3;
+        // Start on the second copy of the list so it can loop both ways. If an
+        // inset is set, line the first image up with the page's content edge.
+        const first = node.children[images.length] as HTMLElement | undefined;
+        if (first && startInset != null) {
+          const inset = window.innerWidth >= 768 ? startInset : 24;
+          node.scrollLeft = first.getBoundingClientRect().left - node.getBoundingClientRect().left + node.scrollLeft - inset;
+        } else {
+          node.scrollLeft = node.scrollWidth / 3;
+        }
       });
     }
   };

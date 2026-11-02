@@ -151,6 +151,7 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
       {featured && featured.images.length > 0 && (
         <GalleryStrip
           objectPosition="top"
+          startInset={100}
           onImageClick={() => openSlideOut(featured.id)}
           scaleOnMobile={0.65}
           images={toStrip(featured.images)}
