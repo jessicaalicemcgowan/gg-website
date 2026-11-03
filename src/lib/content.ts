@@ -108,6 +108,7 @@ export type Homepage = {
   approachText?: string;
   approachImages: Img[];
   featureImage?: Img;
+  featureGallery: Img[];
   exhibitionText?: string;
   projects: Record<string, Project>;
 };
@@ -123,7 +124,8 @@ export async function getHomepage(): Promise<Homepage> {
       "grid": projectsGrid[defined(project._ref)]{ "projectId": project._ref, "image": image ${RAW("@")}, extraCaption },
       "featuredImages": featuredImages[defined(image.asset)] ${IMG},
       "approachImages": approachImages[defined(image.asset)] ${IMG},
-      "featureImage": featureImage ${IMG}
+      "featureImage": featureImage ${IMG},
+      "featureGallery": featureGallery[defined(image.asset)] ${IMG}
     },
     "projects": *[_type=="project"] | order(name asc) ${PROJECT}
   }`);
@@ -162,6 +164,7 @@ export async function getHomepage(): Promise<Homepage> {
     approachText: h.approachText,
     approachImages: clean(h.approachImages),
     featureImage: h.featureImage?.url ? h.featureImage : undefined,
+    featureGallery: clean(h.featureGallery),
     exhibitionText: h.exhibitionText,
     projects,
   };

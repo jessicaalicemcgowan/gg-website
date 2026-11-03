@@ -18,6 +18,7 @@ export default function CaseStudyContent({
 }) {
   return (
     <div className="bg-brown text-beige min-h-full px-6 md:px-10 pt-[200px] pb-[180px] flex flex-col gap-14">
+      {project.name && (
       <div className="flex items-baseline gap-20">
         <p className="font-display text-2xl">{project.name}</p>
         {onOpenInfo && (project.location || project.blurb) && (
@@ -29,6 +30,7 @@ export default function CaseStudyContent({
           </button>
         )}
       </div>
+      )}
 
       <CaseStudyGallery images={project.images} projectName={project.name} />
     </div>

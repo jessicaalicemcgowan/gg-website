@@ -85,6 +85,14 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
     setInfoOpen(false);
     setBeige(true);
   };
+  // Closing image gallery: same slide-out layout as a project, no heading/info.
+  const openFeatureGallery = () => {
+    const p: Project = { id: "feature-gallery", slug: "", name: "", images: data.featureGallery };
+    setActive(p);
+    setSlideOutOpen(true);
+    setInfoOpen(false);
+    setBeige(true);
+  };
   const closeSlideOut = () => {
     setSlideOutOpen(false);
     setInfoOpen(false);
@@ -203,9 +211,21 @@ export default function SonRullanNarrative({ data, footer }: { data: Homepage; f
       <div className="max-w-[1440px] mx-auto px-6 md:px-[100px] pt-16 md:pt-24 pb-8 flex flex-col items-center gap-16">
         {data.featureImage && (
           <Reveal className="flex flex-col gap-3 w-full max-w-[458px]">
-            <div className="relative w-full" style={{ aspectRatio: `${data.featureImage.w} / ${data.featureImage.h}` }}>
-              <Image src={data.featureImage.url} alt={data.featureImage.caption ?? ""} fill sizes="500px" className="object-cover" />
-            </div>
+            {(() => {
+              const fi = data.featureImage!;
+              const img = (
+                <div className="relative w-full" style={{ aspectRatio: `${fi.w} / ${fi.h}` }}>
+                  <Image src={fi.url} alt={fi.caption ?? ""} fill sizes="500px" className="object-cover" />
+                </div>
+              );
+              return data.featureGallery.length ? (
+                <button type="button" onClick={openFeatureGallery} className="block w-full cursor-pointer" aria-label="Open gallery">
+                  {img}
+                </button>
+              ) : (
+                img
+              );
+            })()}
             {data.featureImage.caption && <p className={caption}>{data.featureImage.caption}</p>}
           </Reveal>
         )}
