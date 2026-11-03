@@ -46,6 +46,24 @@ export default function Carousel({
           </motion.div>
         ))}
       </button>
+      {total > 1 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {images.map((img, i) => (
+            <button
+              key={img.src + i}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Show image ${i + 1} of ${total}`}
+              aria-current={i === index}
+              className={`relative w-[52px] aspect-[4/5] overflow-hidden cursor-pointer transition-opacity duration-300 ${
+                i === index ? "opacity-100" : "opacity-45 hover:opacity-80"
+              }`}
+            >
+              <Image src={img.src} alt="" fill sizes="52px" className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
       {current.caption && (
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.p
