@@ -60,7 +60,7 @@ export default function SlideOutPanel({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             onClick={onClose}
-            className={clsx("fixed inset-0 bg-black/10", layer === 0 ? "z-10" : "z-[22]")}
+            className={clsx("fixed inset-0 bg-black/25", layer === 0 ? "z-10" : "z-[22]")}
           />
           <motion.div
             initial={{ x: "100%" }}
@@ -68,7 +68,7 @@ export default function SlideOutPanel({
             exit={{ x: "100%" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className={clsx(
-              "fixed top-0 bottom-0 overflow-y-auto no-scrollbar shadow-[-12px_0_70px_rgba(0,0,0,0.10)]",
+              "fixed top-0 bottom-0 overflow-y-auto no-scrollbar",
               layer === 0
                 ? "right-0 w-full sm:w-[86%] md:w-3/4 bg-brown text-beige z-20"
                 : "right-0 w-full sm:w-[86%] md:w-[74%] lg:w-[60%] bg-stone text-beige z-[25]"
